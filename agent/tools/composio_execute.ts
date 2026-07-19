@@ -38,12 +38,13 @@ export default defineTool({
   description:
     "Execute any Composio-integrated SaaS tool (Gmail, Slack, GitHub, Notion, Linear, Jira, Stripe, etc.). Use this to interact with 1000+ tools without managing authentication.",
   inputSchema: z.object({
-    action: z.string().describe(
-      "The Composio action name (e.g., 'gmail_send_email', 'github_create_issue', 'slack_send_message')"
-    ),
-    input: z.record(z.unknown()).describe(
-      "The input parameters for the action (varies by action)"
-    ),
+    action: z
+      .string()
+      .min(1)
+      .describe(
+        "The Composio action name (e.g., 'gmail_send_email', 'github_create_issue', 'slack_send_message')"
+      ),
+    input: z.any().describe("The input parameters for the action (varies by action)"),
     user_id: z.string().optional().describe(
       "The user ID for session-based authentication. If omitted, uses app principal."
     ),

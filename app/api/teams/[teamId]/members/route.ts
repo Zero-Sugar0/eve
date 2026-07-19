@@ -7,9 +7,10 @@ import * as repo from "@/lib/db/repositories";
  */
 export async function GET(
   request: NextRequest,
-  { params }: { params: { teamId: string } },
+  { params }: { params: Promise<{ teamId: string }> },
 ) {
   try {
+    const { teamId } = await params;
     const session = await auth.api.getSession({
       headers: request.headers,
     });
@@ -19,7 +20,7 @@ export async function GET(
     }
 
     // Verify user is team member
-    const userRole = await repo.getUserRole(params.teamId, session.user.id);
+    const userRole = await repo.getUserRole(teamId, session.user.id);
     if (!userRole) {
       return NextResponse.json(
         { error: "Not a team member" },
@@ -27,7 +28,7 @@ export async function GET(
       );
     }
 
-    const members = await repo.getTeamMembers(params.teamId);
+    const members = await repo.getTeamMembers(teamId);
     return NextResponse.json(members);
   } catch (error) {
     console.error("GET /api/teams/[teamId]/members error:", error);
@@ -43,9 +44,10 @@ export async function GET(
  */
 export async function POST(
   request: NextRequest,
-  { params }: { params: { teamId: string } },
+  { params }: { params: Promise<{ teamId: string }> },
 ) {
   try {
+    const { teamId } = await params;
     const session = await auth.api.getSession({
       headers: request.headers,
     });
@@ -55,7 +57,7 @@ export async function POST(
     }
 
     // Verify user is admin
-    const userRole = await repo.getUserRole(params.teamId, session.user.id);
+    const userRole = await repo.getUserRole(teamId, session.user.id);
     if (userRole !== "admin") {
       return NextResponse.json(
         { error: "Only admins can add members" },
@@ -73,7 +75,7 @@ export async function POST(
     // For now, return placeholder response
     const newMember = {
       id: `member_${Date.now()}`,
-      teamId: params.teamId,
+      teamId: teamId,
       userId: `user_${Date.now()}`,
       role,
       joinedAt: new Date(),
