@@ -85,6 +85,7 @@ export async function POST(request: NextRequest) {
     }
 
     const run = await repo.logAgentRun(session.user.id, {
+      userId: session.user.id,
       teamId: teamId || null,
       agentType: agentType || null,
       action: action || null,
@@ -95,7 +96,7 @@ export async function POST(request: NextRequest) {
       duration: duration || null,
       cost: cost || null,
       metadata: metadata || null,
-    });
+    } as Parameters<typeof repo.logAgentRun>[1]);
 
     return NextResponse.json(run, { status: 201 });
   } catch (error) {

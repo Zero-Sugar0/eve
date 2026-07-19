@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import * as repo from "@/lib/db/repositories";
-import { nanoid } from "nanoid";
 
 /**
  * GET /api/teams - List user's teams

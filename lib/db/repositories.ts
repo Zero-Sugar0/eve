@@ -37,19 +37,24 @@ export async function createTeam(
   description?: string,
   image?: string,
 ): Promise<Team> {
+  const teamId = `team_${crypto.randomUUID().split('-')[0]}`;
+  
   const [newTeam] = await db
     .insert(team)
     .values({
+      id: teamId,
       name,
       slug,
-      description,
-      image,
+      description: description || null,
+      image: image || null,
       createdBy: userId,
     })
     .returning();
 
   // Add creator as admin
+  const memberId = `tmem_${crypto.randomUUID().split('-')[0]}`;
   await db.insert(teamMember).values({
+    id: memberId,
     teamId: newTeam.id,
     userId,
     role: "admin",
@@ -96,9 +101,12 @@ export async function addTeamMember(
   userId: string,
   role: "admin" | "member" | "viewer" = "member",
 ): Promise<TeamMember> {
+  const memberId = `tmem_${crypto.randomUUID().split('-')[0]}`;
+  
   const [newMember] = await db
     .insert(teamMember)
     .values({
+      id: memberId,
       teamId,
       userId,
       role,
@@ -152,10 +160,12 @@ export async function logAgentRun(
   userId: string,
   data: Omit<AgentRun, "id" | "createdAt">,
 ): Promise<AgentRun> {
+  const runId = `run_${crypto.randomUUID().split('-')[0]}`;
+  
   const [run] = await db
     .insert(agentRun)
     .values({
-      userId,
+      id: runId,
       ...data,
     })
     .returning();
@@ -224,16 +234,19 @@ export async function createComposioSession(
   scope?: string,
   teamId?: string,
 ): Promise<ComposioSession> {
+  const sessionId = `sess_${crypto.randomUUID().split('-')[0]}`;
+  
   const [session] = await db
     .insert(composioSession)
     .values({
+      id: sessionId,
       userId,
-      teamId,
+      teamId: teamId || null,
       accessToken,
-      refreshToken,
+      refreshToken: refreshToken || null,
       expiresAt,
       provider,
-      scope,
+      scope: scope || null,
     })
     .returning();
   return session;
@@ -290,15 +303,19 @@ export async function createWorkflow(
   description?: string,
   tags?: string[],
 ): Promise<Workflow> {
+  const workflowId = `wf_${crypto.randomUUID().split('-')[0]}`;
+  
   const [wf] = await db
     .insert(workflow)
     .values({
+      id: workflowId,
       teamId,
       createdBy: userId,
       name,
       definition,
-      description,
-      tags,
+      description: description || null,
+      tags: tags || null,
+      isPublished: false,
     })
     .returning();
   return wf;
